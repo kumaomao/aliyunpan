@@ -1,0 +1,229 @@
+{[ define "preview/preview_video.html" ]}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="referrer" content="no-referrer" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="renderer" content="webkit" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="Cache-Control" content="no-siteapp" />
+	<meta name="theme-color" content="#ffffff">
+	<link rel="shortcut icon" href="https://gw.alicdn.com/imgextra/i3/O1CN01aj9rdD1GS0E8io11t_!!6000000000620-73-tps-16-16.ico">
+	<title>{[ .title ]}</title>
+	<link href="https://cdn.bootcdn.net/ajax/libs/mdui/1.0.1/css/mdui.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.8/dist/clipboard.min.js"></script>
+</head>
+<style>
+	.mdui-container{
+		padding: 24px 8px 62px;
+	}
+
+	.mdui-dialog{
+		border-radius: 0;
+	}
+	
+	.loading{
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0,0,0,.7);
+		z-index: 99999;
+		text-align: center;
+	}
+
+	.loading>.mdui-spinner{
+		position: absolute;
+		top:50%;
+		margin-top: -25px;
+		width: 50px;
+		height: 50px;
+	}
+
+	.loading>.mdui-spinner>.mdui-spinner-layer{
+		border-color: #fff;
+	}
+
+	.loading>.mdui-spinner .mdui-spinner-circle{
+		border-width: 4px;
+	}
+
+	.header{
+		background-color: #fff;
+		height: 60px;
+		line-height: 60px;
+		box-shadow: 0 1px 6px 0 rgba(32,33,36,.28);
+	}
+
+	.mdui-typo-title{
+		color: #262626;
+		font-weight: 300;
+		font-size: 20px;
+	}
+
+	.mdui-typo-title>i{
+		font-size: 36px;
+		color: #1b9aee;
+	}
+
+	.filelist i.mdui-icon,.mdui-typo-subheading i.mdui-icon{
+		color: #1b9aee;
+	}
+
+	.mdui-theme-layout-dark{
+		background-color: #252525;
+	}
+
+	.header{
+    	background-color: #f4f4f4;
+	}
+
+	.mdui-theme-layout-dark .header{
+		color: #fff;
+    	background-color: #303030;
+	}
+
+	.mdui-theme-layout-dark .mdui-typo-title{
+		color: #fff;
+	}
+
+	.right-icon{
+		color: #555;
+	}
+
+	.mdui-theme-layout-dark .right-icon{
+		color: #fff;
+	}
+
+	.right-icon .mdui-btn-icon{
+		width: 48px;
+		height: 48px;
+	}
+	
+	footer{
+		position: relative;
+		bottom: 20px;
+		width: 100%;
+	}
+
+	footer a{
+		color: #000;
+		text-decoration: none;
+	}
+
+	.mdui-theme-layout-dark footer a{
+		color: #fff;
+	}
+</style>
+<body>
+<div class="loading" id="loading"><div class="mdui-spinner"></div></div>
+
+<div class="mdui-container">
+
+    <div class="mdui-typo-subheading mdui-m-b-1"><button class="mdui-btn mdui-btn-raised mdui-ripple" onclick="window.open('{[ .ref.url ]}','_self')"><i class="mdui-icon material-icons"  style="font-size: 1.3em;">arrow_back</i>返回至目录</button>
+    
+<!--    <button class="mdui-btn mdui-btn-raised mdui-ripple"  id="btn_Copy"><i class="mdui-icon material-icons"  style="font-size: 1.3em;">content_copy</i>  复制转存链接</button>-->
+<!--    -->
+    </div>
+    
+    <div class="mdui-divider mdui-m-b-2"></div>
+    
+<script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dashjs/dist/dash.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flv.js/dist/flv.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/dplayer/1.26.0/DPlayer.min.js"></script>
+    <div id="player"></div>
+<div class="mdui-video-container">
+      <div class="mdui-dialog" id="success_dialog">
+    <div class="mdui-dialog-title">复制成功</div>
+    <div class="mdui-dialog-content">提取文件教程：https://bbs.tampermonkey.net.cn/thread-427-1-1.html</div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>确定</button>
+    </div>
+  </div>
+      <div class="mdui-dialog" id="error_dialog">
+    <div class="mdui-dialog-title">提示</div>
+    <div class="mdui-dialog-content">复制失败!</div>
+    <div class="mdui-dialog-actions">
+      <button class="mdui-btn mdui-ripple" mdui-dialog-cancel>确定</button>
+    </div>
+  </div>
+
+
+<script>
+const dp = new DPlayer({
+                    container: document.getElementById('player'),
+                    video: {
+                    quality:JSON.parse({[ .vedioJson ]}) ,
+                    defaultQuality: 0,
+                    pic: '{[.info.Thumbnail]}'
+                    }});
+</script>
+    <a href="/main/download?file={[ .info.FileId ]}" class="mdui-btn mdui-btn-block mdui-ripple mdui-m-t-2" style="background-color: #1b9aee;color: #fff;"><i class="mdui-icon material-icons" style="font-size: 1.3em;">get_app</i>下载</a>
+</div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/mdui/1.0.1/js/mdui.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script>
+$(function(){
+    footer_bottom();
+    if(localStorage.getItem('dark') == 'true'){
+        $('body').addClass('mdui-theme-layout-dark');
+        $('#theme-toggle i').text('brightness_5');
+    }
+
+    $('#theme-toggle').click(function(){
+        if($('body').hasClass('mdui-theme-layout-dark')){
+            $('body').removeClass('mdui-theme-layout-dark');
+            $('#theme-toggle i').text('brightness_4');
+            localStorage.setItem('dark',false);
+        }else{
+            $('body').addClass('mdui-theme-layout-dark');
+            $('#theme-toggle i').text('brightness_5');
+            localStorage.setItem('dark',true);
+        }
+    });
+
+    $(window).resize(function(){
+        footer_bottom();
+    })
+
+});
+function footer_bottom(){
+    console.log($(window).height() - $('body').height(),-(42 - $('footer').height()))
+    if(($(window).height() - $('body').height()) > -25){
+        $('footer').css({'position':'fixed'})
+    }else{
+        $('footer').css({'position':'relative'})
+    }
+}
+</script>
+  <script>
+//这里以复制URL为例
+        var clipboard = new ClipboardJS('#btn_Copy', {
+            text: function () {
+                var url = "[转存链接]";
+                return url;
+            }
+        });
+
+        clipboard.on('success', function (e) {
+            var inst = new mdui.Dialog('#success_dialog');
+            inst.open();
+        });
+
+        clipboard.on('error', function (e) {
+            var inst = new mdui.Dialog('#error_dialog');
+            inst.open();
+        });
+    </script>
+</body>
+</html>
+
+{[ end ]}

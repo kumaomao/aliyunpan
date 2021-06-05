@@ -1,0 +1,10 @@
+#刷新令牌
+refreshToken : ""
+
+server:
+  port : 8085
+
+view :
+  htmlGlob : "templates/**/*"
+  letfDelim : "{["
+  rightDelim : "]}"
