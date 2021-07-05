@@ -29,7 +29,7 @@ func MainView(c *gin.Context) {
 	if(err != nil){
 		fmt.Println("文件列表获取失败")
 	}
-	count := len(yp.DataItems.Item)
+	count := len(list.Item)
 
 	info,_ := yp.GetDownloadUrl(folder)
 	parent := info.ParentFileId
