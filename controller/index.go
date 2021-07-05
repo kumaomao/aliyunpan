@@ -2,8 +2,10 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"regexp"
 	"yp/yunpan"
 )
 
@@ -23,7 +25,10 @@ func MainView(c *gin.Context) {
 		"parent_file_id"				: folder,
 		"video_thumbnail_process"		: "video/snapshot,t_0,f_jpg,ar_auto,w_300",
 	}
-	yp.GetList(data)
+	list,err := yp.GetList(data)
+	if(err != nil){
+		fmt.Println("文件列表获取失败")
+	}
 	count := len(yp.DataItems.Item)
 
 	info,_ := yp.GetDownloadUrl(folder)
@@ -45,11 +50,19 @@ func MainView(c *gin.Context) {
 		}
 	}
 
-	c.HTML(http.StatusOK, "main/index.html", gin.H{
+	//判断是否是手机访问
+	User_Agent := c.GetHeader("User-Agent")
+	view := "main/index.html"
+	mobileRe, _ := regexp.Compile("(?i:Mobile|iPod|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP)")
+	isNobile := mobileRe.FindString(User_Agent)
+	if isNobile != ""{
+		view = "main/mobile_index.html"
+	}
+	c.HTML(http.StatusOK, view, gin.H{
 		"title"		: "阿里云盘分享",
 		"userInfo" 	: yp.RefreshInfo,
 		"count" 	: count,
-		"list"		: yp.DataItems.Item,
+		"list"		: list.Item,
 		"ref"		: ref,
 	})
 }
@@ -84,7 +97,6 @@ func MultiDownload(c *gin.Context)  {
 			},
 		},
 	}
-
 	down,err := yp.MultiDownloadUrl(data)
 	if err != nil{
 		return

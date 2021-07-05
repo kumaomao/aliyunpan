@@ -15,6 +15,8 @@ func Route(r *gin.Engine){
 
 	}
 
+	r.GET("/", controller.MainView)
+
 
 }
 

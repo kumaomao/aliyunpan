@@ -105,6 +105,7 @@ func init(){
 //身份信息刷新
 func (y *Yp) Refresh()  {
 	url := "https://auth.aliyundrive.com/v2/account/token"
+
 	refresh_token := config.Conf.RefreshToken
 	data := map[string]string{
 		"grant_type"	: "refresh_token",
@@ -128,7 +129,7 @@ func (y *Yp) Refresh()  {
 }
 
 //获取文件列表
-func (y *Yp) GetList(data map[string]interface{}) error {
+func (y *Yp) GetList(data map[string]interface{}) (DataItems,error) {
 	url := "https://api.aliyundrive.com/v2/file/list"
 	data_json,_ :=json.Marshal(data)
 	header := map[string]string{
@@ -139,12 +140,9 @@ func (y *Yp) GetList(data map[string]interface{}) error {
 	}
 
 	respByte, _ := y.curl(url,"POST",string(data_json),header)
-	err := json.Unmarshal([]byte(respByte), &y.DataItems)
-	if err != nil{
-		fmt.Println(err)
-		return err
-	}
-	return nil
+	list := y.DataItems
+	err := json.Unmarshal([]byte(respByte), &list)
+	return list,err
 }
 
 //获取下载地址
@@ -275,6 +273,7 @@ func (y *Yp) Heartbeat()  {
 	ticker := time.NewTicker(time.Second * 6500)
 	go func() {
 		for range ticker.C {
+			fmt.Println("心跳启动")
 			//执行
 			y.Refresh()
 		}

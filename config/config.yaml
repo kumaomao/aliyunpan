@@ -1,5 +1,5 @@
 #刷新令牌
-refreshToken : ""
+refreshToken : "220c692f31304892a5daa9d34ecac788"
 
 server:
   port : 8085
