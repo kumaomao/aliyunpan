@@ -193,10 +193,11 @@ func (y *Yp)GetAudioPlayInfo(file_id string) (map[string]interface{},error){
 
 //获取视频详情
 func (y *Yp)GetVideoPlayInfo(file_id string) (map[string]interface{},error){
-	url := "https://api.aliyundrive.com/v2/databox/get_video_play_info"
+	url := "https://api.aliyundrive.com/v2/file/get_video_preview_play_info"
 	data := map[string]interface{}{
 		"drive_id"						: y.RefreshInfo.DefaultDriveId,
 		"file_id"						: file_id,
+		"category" 						: "live_transcoding",
 	}
 	data_json,_ :=json.Marshal(data)
 	header := map[string]string{
