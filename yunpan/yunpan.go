@@ -114,15 +114,21 @@ func (y *Yp) Refresh()  {
 	data_json,_ :=json.Marshal(data)
 	header := map[string]string{
 		"Content-Type"		:"application/json",
-		"origin"			:"https://www.aliyundrive.com",
-		"referer"			:"https://www.aliyundrive.com",
+		"origin"			:"https://aliyundrive.com",
+		"referer"			:"https://aliyundrive.com",
+		"user-agent"		:"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36",
+		"accept"			:"*/*",
+		"Accept-Language"	:"zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3",
+		"Connection"		:"keep-alive",
 	}
 
 	respByte, _ := y.curl(url,"POST",string(data_json),header)
+
 	err := json.Unmarshal([]byte(respByte), &y.RefreshInfo)
 	if err != nil{
 		fmt.Println(err)
 	}
+	fmt.Println(string(respByte))
 	//写入新的刷新refresh_token
 	config.Conf.RefreshToken = y.RefreshInfo.RefreshToken
 
@@ -140,6 +146,7 @@ func (y *Yp) GetList(data map[string]interface{}) (DataItems,error) {
 	}
 
 	respByte, _ := y.curl(url,"POST",string(data_json),header)
+	fmt.Println(string(respByte))
 	list := y.DataItems
 	err := json.Unmarshal([]byte(respByte), &list)
 	return list,err

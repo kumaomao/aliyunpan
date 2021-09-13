@@ -11,6 +11,7 @@ import (
 
 func MainView(c *gin.Context) {
 	yp := yunpan.Yunpan
+	yp.Refresh()
 	folder := c.DefaultQuery("folder","root")
 	//获取文件列表
 	data := map[string]interface{}{
@@ -140,7 +141,9 @@ func Preview(c *gin.Context)  {
 				"url"		: info.Url,
 				"type"		: "auto",
 			})
-			for _,v := range fileInfo["template_list"].([]interface{}){
+			fmt.Println(fileInfo)
+			fileInfoMap := fileInfo["video_preview_play_info"].(map[string]interface{})
+			for _,v := range fileInfoMap["live_transcoding_task_list"].([]interface{}){
 				urlList = append(urlList,map[string]string{
 					"name"		: quality[v.(map[string]interface{})["template_id"].(string)],
 					"url"		: v.(map[string]interface{})["url"].(string),
